@@ -1,0 +1,33 @@
+Installation
+------------
+Place the files in the lti sub-directory of wp-content/plugins and the
+enable the plugin via the Network admin interface
+
+  - select My Sites -> Network Admin -> Dashboard
+  - select Plugins
+
+This plugin is called LTI; selecting the Network Activate option will create the requireds database tables and add a "LTI Tool Consumers" option to the network menu.
+
+Use the "Add New" option to add an LTI tool consumer.  The consumer should be given a name (for display in WordPress) and a key and secret.  The consumer will be disabled by default.
+
+The launch URL for accessing WordPress from a tool consumer is the root URL for the WordPress site with a query parameter of "lti"; e.g.:
+
+  http[s]://yourwordpressURL/[<subfolder>/]?lti
+
+You are ready to go!
+
+
+Removing the plugin
+-------------------
+Use the following SQL commands to drop the tables when removing the plugin:
+
+	DROP TABLE wp_lti_user;
+	DROP TABLE wp_lti_nonce;
+	DROP TABLE wp_lti_share_key;
+	DROP TABLE wp_lti_context;
+	DROP TABLE wp_lti_consumer;
+
+
+Email
+-----
+Accounts are provisioned in WordPress by the plugin but these are not given email addresses to avoid issues with multiple user accounts having the same email. This means that allowing users to edit their profiles causes problem due to the missing email. Therefore this option has been removed from the menus and the admin bar.
