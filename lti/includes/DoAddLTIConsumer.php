@@ -1,5 +1,7 @@
 <?php
 /*
+ *	Original license info...
+ *
  *  wordpress-lti - WordPress module to add LTI support
  *  Copyright (C) 2013  Simon Booth, Stephen P Vickers
  *
