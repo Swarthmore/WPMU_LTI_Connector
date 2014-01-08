@@ -175,7 +175,10 @@ function lti_add_consumer() {
     <td>
       <?php
         switch (lti_get_scope($consumer->getKey())) {
-        case '3' :
+		case '4' :
+			_e('Global: Use email only', 'lti-text');
+          break;
+		case '3' :
           _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text');
           break;
         case '2' :
@@ -198,6 +201,11 @@ function lti_add_consumer() {
         <legend class="screen-reader-text">
           <span><?php _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text') ?></span>
         </legend>
+        <!-- Swat Edit: Added lti_scope4 -->
+        <label for="lti_scope4">
+              <input name="lti_scope" type="radio" id="lti_scope4" value="4" <?php checked('4', $options['scope']); ?> />
+              <?php _e('Global: Use Email Only', 'lti-text'); ?>
+            </label><br />
         <label for="lti_scope3">
           <input name="lti_scope" type="radio" id="lti_scope3" value="3" <?php checked('3', $options['scope']); ?> />
           <?php _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text'); ?>

@@ -1,12 +1,12 @@
 <?php
 /*
-Plugin Name: LTI
-Plugin URI: http://www.spvsoftwareproducts.com/php/wordpress-lti/
-Description: This plugin allows WordPress to be integrated with on-line courses using the IMS Learning Tools Interoperability (LTI) specification.
+Plugin Name: WPMU LTI
+Plugin URI: https://github.com/Swarthmore/WPMU_LTI_Connector
+Description: This plugin allows WordPress to be integrated with on-line courses using the IMS Learning Tools Interoperability (LTI) specification. It is a fork ofthe LTI Connector for WordPress by SPV Software Products (Simon Booth, Stephen Vickers). Their original project can be found here: http://www.spvsoftwareproducts.com/php/wordpress-lti/ 
 Version: 1.0
 Network: true
-Author: Simon Booth, Stephen Vickers
-Author URI: http://www.celtic-project.org/
+Author: 
+Author URI: 
 License: GPL2
 */
 
@@ -403,6 +403,11 @@ function lti_options() {
             <legend class="screen-reader-text">
               <span><?php _e('Default Username Format', 'lti-text') ?></span>
             </legend>
+            <!-- Swat Edit: Added Scope 4 option -->
+            <label for="lti_scope4">
+              <input name="lti_choices[scope]" type="radio" id="lti_scope4" value="4" <?php checked('4', $options['scope']); ?> />
+              <?php _e('Global: Use Email Only', 'lti-text'); ?>
+            </label><br />
             <label for="lti_scope3">
               <input name="lti_choices[scope]" type="radio" id="lti_scope3" value="3" <?php checked('3', $options['scope']); ?> />
               <?php _e('Resource: Prefix the ID with the consumer key and resource link ID', 'lti-text'); ?>
