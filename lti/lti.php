@@ -1,12 +1,12 @@
 <?php
 /*
-Plugin Name: WPMU LTI
+Plugin Name: WPMU LTI Connector
 Plugin URI: https://github.com/Swarthmore/WPMU_LTI_Connector
 Description: This plugin allows WordPress to be integrated with on-line courses using the IMS Learning Tools Interoperability (LTI) specification. It is a fork ofthe LTI Connector for WordPress by SPV Software Products (Simon Booth, Stephen Vickers). Their original project can be found here: http://www.spvsoftwareproducts.com/php/wordpress-lti/ 
 Version: 1.0
 Network: true
-Author: 
-Author URI: 
+Author: Swarthmore College based on work by, Simon Booth, and Stephen Vickers 
+Author URI: https://github.com/Swarthmore/WPMU_LTI_Connector
 License: GPL2
 */
 
