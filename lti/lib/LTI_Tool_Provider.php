@@ -497,6 +497,7 @@ class LTI_Tool_Provider {
 #
 ### Set the request context/resource link
 #
+
       $this->resource_link = new LTI_Resource_Link($this->consumer, trim($_POST['resource_link_id']));
       if (isset($_POST['context_id'])) {
         $this->resource_link->lti_context_id = trim($_POST['context_id']);
@@ -516,6 +517,19 @@ class LTI_Tool_Provider {
         $title = "Course {$this->resource_link->getId()}";
       }
       $this->resource_link->title = $title;
+	  
+	  
+	   $context_label = '';
+      if (isset($_POST['context_label'])) {
+        $context_label = trim($_POST['context_label']);
+      }
+      if (empty($context_label)) {
+        $context_label = $this->resource_link->lti_context_id;
+
+      }
+      $this->resource_link->context_label = $context_label;
+
+	  
 // Save LTI parameters
       foreach ($this->lti_settings_names as $name) {
         if (isset($_POST[$name])) {
