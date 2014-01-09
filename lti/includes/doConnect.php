@@ -120,8 +120,9 @@ function lti_do_connect($tool_provider) {
   // set up some useful variables
   $key = $tool_provider->resource_link->getKey();
   $context_id = $tool_provider->context->getId();
+  //Swat Edit to get contect label
+  $context_label = slugify($tool_provider->resource_link->context_label);
   $resource_id = $tool_provider->resource_link->getId();
-
   // Create blog
   $use_context = FALSE;
   if (!empty($context_id)) $use_context = ($tool_provider->resource_link->getSetting('custom_use_context') == 'true') ? TRUE : FALSE;
@@ -130,24 +131,26 @@ function lti_do_connect($tool_provider) {
     // Create new blog, if does not exist. Note this gives one blog per context, the consumer supplies a context_id
     // otherwise it creates a blog per resource_id
     $path = $key . '_' . $context_id;
+  
   } else {
     // Create new blog, if does not exist. Note this gives one blog per resource_id
-    $path = $key . $resource_id;
+    //swat Edit to get $content_label $path = $key . $resource_id;
+	$path = $context_label;
   }
-
   // Replace any non-allowed characters in WordPress with -
+
   $path = preg_replace('/[^_0-9a-zA-Z-]+/', '-', $path);
 
   // Sanity Check: Ensure that path is only _A-Za-z0-9- --- the above should stop this.
   if (preg_match('/[^_0-9a-zA-Z-]+/', $path) == 1) {
     $tool_provider->reason = __('No Blog has been created as the name contains non-alphanumeric: (_a-zA-Z0-9-) allowed', 'lti-text');
-    return FALSE;
+	return FALSE;
   }
 
   // Get any folder(s) that WordPress might be living in
   $wppath = parse_url(get_option('siteurl'), PHP_URL_PATH);
   $path = $wppath . '/' . trailingslashit($path);
-
+	
   // Get the id of the blog, if exists
   $blog_id = domain_exists(DOMAIN_CURRENT_SITE, $path, 1);
   // If Blog does not exist and this is a member of staff and blog provisioning is on, create blog

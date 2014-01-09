@@ -296,7 +296,10 @@ class LTI_Tool_Provider {
 ### Callback function may return HTML, a redirect URL, or a boolean value
 #
       if (is_string($result)) {
-        if ((substr($result, 0, 7) == 'http://') || (substr($result, 0, 8) == 'https://')) {
+       	//Swat Edit to make sure user can edit while WP-Admin has forced SSL
+		$result = str_replace("https://", "http://", $result);
+		//End Swat Edit
+		if ((substr($result, 0, 7) == 'http://') || (substr($result, 0, 8) == 'https://')) {
           $this->redirectURL = $result;
         } else {
           if (is_null($this->output)) {
@@ -497,6 +500,7 @@ class LTI_Tool_Provider {
 #
 ### Set the request context/resource link
 #
+
       $this->resource_link = new LTI_Resource_Link($this->consumer, trim($_POST['resource_link_id']));
       if (isset($_POST['context_id'])) {
         $this->resource_link->lti_context_id = trim($_POST['context_id']);
@@ -516,6 +520,19 @@ class LTI_Tool_Provider {
         $title = "Course {$this->resource_link->getId()}";
       }
       $this->resource_link->title = $title;
+	  
+	  
+	   $context_label = '';
+      if (isset($_POST['context_label'])) {
+        $context_label = trim($_POST['context_label']);
+      }
+      if (empty($context_label)) {
+        $context_label = $this->resource_link->lti_context_id;
+
+      }
+      $this->resource_link->context_label = $context_label;
+
+	  
 // Save LTI parameters
       foreach ($this->lti_settings_names as $name) {
         if (isset($_POST[$name])) {
