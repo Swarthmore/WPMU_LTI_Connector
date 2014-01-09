@@ -123,9 +123,6 @@ function lti_do_connect($tool_provider) {
   //Swat Edit to get contect label
   $context_label = slugify($tool_provider->resource_link->context_label);
   $resource_id = $tool_provider->resource_link->getId();
-//error_log(print_r($context_label));
-// error_log(print_r($tool_provider->resource_link->context_label));
-//error_log(print_r(slugify($tool_provider->resource_link->context_label)));
   // Create blog
   $use_context = FALSE;
   if (!empty($context_id)) $use_context = ($tool_provider->resource_link->getSetting('custom_use_context') == 'true') ? TRUE : FALSE;
@@ -141,7 +138,6 @@ function lti_do_connect($tool_provider) {
 	$path = $context_label;
   }
   // Replace any non-allowed characters in WordPress with -
-    error_log($path);
 
   $path = preg_replace('/[^_0-9a-zA-Z-]+/', '-', $path);
 

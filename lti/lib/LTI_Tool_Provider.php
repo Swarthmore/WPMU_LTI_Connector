@@ -296,7 +296,10 @@ class LTI_Tool_Provider {
 ### Callback function may return HTML, a redirect URL, or a boolean value
 #
       if (is_string($result)) {
-        if ((substr($result, 0, 7) == 'http://') || (substr($result, 0, 8) == 'https://')) {
+       	//Swat Edit to make sure user can edit while WP-Admin has forced SSL
+		$result = str_replace("https://", "http://", $result);
+		//End Swat Edit
+		if ((substr($result, 0, 7) == 'http://') || (substr($result, 0, 8) == 'https://')) {
           $this->redirectURL = $result;
         } else {
           if (is_null($this->output)) {
