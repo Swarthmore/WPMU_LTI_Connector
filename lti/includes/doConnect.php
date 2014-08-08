@@ -61,30 +61,96 @@ function lti_do_connect($tool_provider) {
   $options = get_site_option('lti_choices');
   $scope_userid = lti_get_scope($tool_provider->consumer->getKey());
   $user_login = $tool_provider->user->getID($scope_userid);
+  //$user_loginEmail = $tool_provider->user->getID($scope_userid);
+
+  $json = $tool_provider->user->lti_result_sourcedid;
+  $obj = json_decode($json);
+
+  $moodleID = intval($obj->data->userid . "000000");
+  error_log($obj->data->userid, 0);
+
   // Sanitize username stripping out unsafe characters
   $user_login = sanitize_user($user_login);
 
   // Apply the function pre_user_login before saving to the DB.
   $user_login = apply_filters('pre_user_login', $user_login);
 
-  // Check if this username, $user_login, is already defined
-  $user = get_user_by('login', $user_login);
 
-  if ($user) {
+// Swat edit: Check which college a user is visiting from
+  if (substr($tool_provider->user->email, -strlen("brynmawr.edu")) === "brynmawr.edu") {
+  	$user_login = $user_login . "-bmc";
+  }
+  elseif (substr($tool_provider->user->email, -strlen("haverford.edu")) === "haverford.edu") {
+  	$user_login = $user_login . "-hc";
+  };
+
+  error_log(print_r($user_login, true),0);
+
+  // Check if this username, $user_login, is already defined
+  $user = get_user_by('id', $moodleID);
+
+  ///Begin Prevent Duplicate Edits
+  $user_email = get_user_by('email', $tool_provider->user->email);
+
+  //MK array of Banned Users
+  $banned_users= array("www", "web", "root", "admin", "main", "invite", "administrator", "files", "blog");
+
+////
+
+
+
+
+
+/////
+  if (!$user) {
     // If user exists, simply save the current details
     $result = wp_insert_user(
       array(
-            'ID' => $user->ID,
+            'ID' => $moodleID,
             'user_login' => $user_login,
             'user_nicename'=> $user_login,
             'first_name' => $tool_provider->user->firstname,
             'last_name' => $tool_provider->user->lastname,
-            //'user_email'=> $tool_provider->user->email,
+            'user_email'=> $tool_provider->user->email,
             //'user_url' => 'http://',
             'display_name' => $tool_provider->user->fullname
              )
     );
-  } else {
+  }
+  //MK avoid dangerous users
+  //elseif (in_array($user_login, $banned_users)){
+//	  wp_logout();
+	//}
+
+	elseif (!filter_var($tool_provider->user->email, FILTER_VALIDATE_EMAIL) || in_array($user_login, $banned_users))  {
+		wp_logout();
+    //Invalid email!
+}
+///BEGIN Prevent Duplicate Edits
+	elseif ($user && !$user_email){
+		$result = wp_insert_user(
+      array(
+            'user_login' => 'duplicate ' . $user_login,
+            'user_pass' => wp_generate_password(),
+            'user_nicename'=> $user_login,
+            'first_name' => $tool_provider->user->firstname,
+            'last_name' => $tool_provider->user->lastname,
+            'user_email'=> $tool_provider->user->email,
+            //'user_url' => 'http://',
+            'display_name' => $tool_provider->user->fullname
+             )
+    );
+	// Handle any errors by capturing and returning to the consumer
+    if (is_wp_error($result)) {
+      $tool_provider->reason = $result->get_error_message();
+      return FALSE;
+    } else {
+      // Get the new users details
+      $user = get_user_by('login', $user_login);
+    }
+		}
+///END Prevent Duplicate Edits
+  else {
     // Create username if user provisioning is on
     $result = wp_insert_user(
       array(
@@ -93,7 +159,7 @@ function lti_do_connect($tool_provider) {
             'user_nicename'=> $user_login,
             'first_name' => $tool_provider->user->firstname,
             'last_name' => $tool_provider->user->lastname,
-            //'user_email'=> $tool_provider->user->email,
+            'user_email'=> $tool_provider->user->email,
             //'user_url' => 'http://',
             'display_name' => $tool_provider->user->fullname
              )
@@ -110,7 +176,6 @@ function lti_do_connect($tool_provider) {
 
   // Get user ID
   $user_id = $user->ID;
-
   // Staff or Learner
   $staff = FALSE;
   $learner = FALSE;
@@ -120,9 +185,11 @@ function lti_do_connect($tool_provider) {
   // set up some useful variables
   $key = $tool_provider->resource_link->getKey();
   $context_id = $tool_provider->context->getId();
+
   //Swat Edit to get contect label
   $context_label = slugify($tool_provider->resource_link->context_label);
   $resource_id = $tool_provider->resource_link->getId();
+
   // Create blog
   $use_context = FALSE;
   if (!empty($context_id)) $use_context = ($tool_provider->resource_link->getSetting('custom_use_context') == 'true') ? TRUE : FALSE;
@@ -131,7 +198,7 @@ function lti_do_connect($tool_provider) {
     // Create new blog, if does not exist. Note this gives one blog per context, the consumer supplies a context_id
     // otherwise it creates a blog per resource_id
     $path = $key . '_' . $context_id;
-  
+
   } else {
     // Create new blog, if does not exist. Note this gives one blog per resource_id
     //swat Edit to get $content_label $path = $key . $resource_id;
@@ -150,7 +217,7 @@ function lti_do_connect($tool_provider) {
   // Get any folder(s) that WordPress might be living in
   $wppath = parse_url(get_option('siteurl'), PHP_URL_PATH);
   $path = $wppath . '/' . trailingslashit($path);
-	
+
   // Get the id of the blog, if exists
   $blog_id = domain_exists(DOMAIN_CURRENT_SITE, $path, 1);
   // If Blog does not exist and this is a member of staff and blog provisioning is on, create blog

@@ -43,7 +43,7 @@ class LTI_WP_User {
   public $firstname;
   public $lastname;
   public $fullname;
-  //public $email;
+  public $email;
   public $roles;
   public $staff = FALSE;
   public $learner = FALSE;
@@ -75,7 +75,7 @@ class LTI_WP_User {
       $this->firstname = $lti_user_from_consumer->firstname;
       $this->lastname = $lti_user_from_consumer->lastname;
       $this->fullname = $lti_user_from_consumer->fullname;
-      //$this->email = $lti_user_from_consumer->email;
+      $this->email = $lti_user_from_consumer->email;
       $role_name = '';
       if (!empty($lti_user_from_consumer->roles)) {
         foreach ($lti_user_from_consumer->roles as $role) {
@@ -479,7 +479,7 @@ function lti_reset_session() {
 //Slugify function was borrowed from Symfony's Jobeet tutorial http://symfony.com/legacy/doc/jobeet/1_2?orm=Propel
 
 function slugify($text)
-{ 
+{
   // replace non letter or digits by -
   $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
 
