@@ -42,7 +42,7 @@ function lti_do_connect($tool_provider) {
   }
 
   // Clear any existing connections
-  wp_logout();
+  //wp_logout();
 
   // Clear these before use
   $_SESSION[LTI_SESSION_PREFIX . 'return_url'] = '';
@@ -61,13 +61,23 @@ function lti_do_connect($tool_provider) {
   $options = get_site_option('lti_choices');
   $scope_userid = lti_get_scope($tool_provider->consumer->getKey());
   $user_login = $tool_provider->user->getID($scope_userid);
-  //$user_loginEmail = $tool_provider->user->getID($scope_userid);
 
-  $json = $tool_provider->user->lti_result_sourcedid;
-  $obj = json_decode($json);
-
-  $moodleID = intval($obj->data->userid . "000000");
-  error_log($obj->data->userid, 0);
+  //Swat edit:
+	$idLoc = strpos(print_r($tool_provider->user,true), '[id:LTI_User:private] =>');
+	$idEOL = strpos(print_r($tool_provider->user,true), ')', $idLoc);
+	$whatwewant = substr(print_r($tool_provider->user,true), $idLoc+25,$idEOL);
+	$matches = array();
+		if (preg_match('/\d*/', $whatwewant, $matches)) {
+	}
+		if (sizeof($matches)>0){
+  			$moodleID = $matches[0];
+		}
+		else{
+			error_log("LTI Error: No Moodle ID found.");
+			$tool_provider->reason="No Moodle ID";
+			return FALSE;
+		}
+	error_log('!!!!!!!!MOOOOOOOODDDDDDLEEEEE !!!! ' . $moodleID);
 
   // Sanitize username stripping out unsafe characters
   $user_login = sanitize_user($user_login);
@@ -75,105 +85,62 @@ function lti_do_connect($tool_provider) {
   // Apply the function pre_user_login before saving to the DB.
   $user_login = apply_filters('pre_user_login', $user_login);
 
-
-// Swat edit: Check which college a user is visiting from
-  if (substr($tool_provider->user->email, -strlen("brynmawr.edu")) === "brynmawr.edu") {
-  	$user_login = $user_login . "-bmc";
-  }
-  elseif (substr($tool_provider->user->email, -strlen("haverford.edu")) === "haverford.edu") {
-  	$user_login = $user_login . "-hc";
-  };
-
-  error_log(print_r($user_login, true),0);
-
   // Check if this username, $user_login, is already defined
-  $user = get_user_by('id', $moodleID);
+  $user = get_user_by('login', $user_login);
 
-  ///Begin Prevent Duplicate Edits
-  $user_email = get_user_by('email', $tool_provider->user->email);
+  //Swat Edit: array of Banned Users
+	$banned_users= array("www", "web", "root", "admin", "main", "invite", "administrator", "files", "blog");
+	$userEmail = $tool_provider->user->email;
 
-  //MK array of Banned Users
-  $banned_users= array("www", "web", "root", "admin", "main", "invite", "administrator", "files", "blog");
-
-////
-
-
-
-
-
-/////
-  if (!$user) {
-    // If user exists, simply save the current details
-    $result = wp_insert_user(
-      array(
-            'ID' => $moodleID,
-            'user_login' => $user_login,
-            'user_nicename'=> $user_login,
-            'first_name' => $tool_provider->user->firstname,
-            'last_name' => $tool_provider->user->lastname,
-            'user_email'=> $tool_provider->user->email,
-            //'user_url' => 'http://',
-            'display_name' => $tool_provider->user->fullname
-             )
-    );
-  }
-  //MK avoid dangerous users
-  //elseif (in_array($user_login, $banned_users)){
-//	  wp_logout();
-	//}
-
-	elseif (!filter_var($tool_provider->user->email, FILTER_VALIDATE_EMAIL) || in_array($user_login, $banned_users))  {
-		wp_logout();
-    //Invalid email!
-}
-///BEGIN Prevent Duplicate Edits
-	elseif ($user && !$user_email){
-		$result = wp_insert_user(
-      array(
-            'user_login' => 'duplicate ' . $user_login,
-            'user_pass' => wp_generate_password(),
-            'user_nicename'=> $user_login,
-            'first_name' => $tool_provider->user->firstname,
-            'last_name' => $tool_provider->user->lastname,
-            'user_email'=> $tool_provider->user->email,
-            //'user_url' => 'http://',
-            'display_name' => $tool_provider->user->fullname
-             )
-    );
-	// Handle any errors by capturing and returning to the consumer
-    if (is_wp_error($result)) {
-      $tool_provider->reason = $result->get_error_message();
-      return FALSE;
-    } else {
-      // Get the new users details
-      $user = get_user_by('login', $user_login);
-    }
+	list($emailUsername, $emailDomain) = explode('@', $tool_provider->user->email);
+	if ($emailDomain !== 'swarthmore.edu'){
+		error_log("!!!!!!!!!!!!!!!!!!!Not from swat!!!!!!!!!!!!!!!!!!!!!!!");
+    $user_login= $user_login . '-' . $moodleID;
 		}
-///END Prevent Duplicate Edits
-  else {
-    // Create username if user provisioning is on
-    $result = wp_insert_user(
-      array(
-            'user_login' => $user_login,
-            'user_pass' => wp_generate_password(),
-            'user_nicename'=> $user_login,
-            'first_name' => $tool_provider->user->firstname,
-            'last_name' => $tool_provider->user->lastname,
-            'user_email'=> $tool_provider->user->email,
-            //'user_url' => 'http://',
-            'display_name' => $tool_provider->user->fullname
-             )
-    );
-    // Handle any errors by capturing and returning to the consumer
-    if (is_wp_error($result)) {
-      $tool_provider->reason = $result->get_error_message();
-      return FALSE;
-    } else {
-      // Get the new users details
-      $user = get_user_by('login', $user_login);
-    }
-  }
 
+	if (!filter_var($tool_provider->user->email, FILTER_VALIDATE_EMAIL) || in_array($user_login, $banned_users))  {
+		wp_logout();
+	}
+
+	elseif ($user) {
+
+// If user exists, simply save the current details
+    $result = wp_insert_user(
+    array(
+      'ID' => $user->ID,
+      'user_login' => $user_login,
+      'user_nicename'=> $user_login,
+      'first_name' => $tool_provider->user->firstname,
+      'last_name' => $tool_provider->user->lastname,
+      'user_email'=> $tool_provider->user->email,
+      //'user_url' => 'http://',
+      'display_name' => $tool_provider->user->fullname
+      )
+    );
+    } else {
+      // Create username if user provisioning is on
+  	  $result = wp_insert_user(
+      array(
+        'user_login' => $user_login,
+        'user_pass' => wp_generate_password(),
+        'user_nicename'=> $user_login,
+        'first_name' => $tool_provider->user->firstname,
+        'last_name' => $tool_provider->user->lastname,
+        'user_email'=> $tool_provider->user->email,
+        //'user_url' => 'http://',
+        'display_name' => $tool_provider->user->fullname
+        )
+      );
+
+        // Handle any errors by capturing and returning to the consumer
+        if (is_wp_error($result)) {
+          $tool_provider->reason = $result->get_error_message();
+          return FALSE;
+        } else {
+          // Get the new users details
+          $user = get_user_by('login', $user_login);
+        }
+  }
   // Get user ID
   $user_id = $user->ID;
   // Staff or Learner
@@ -188,6 +155,7 @@ function lti_do_connect($tool_provider) {
 
   //Swat Edit to get contect label
   $context_label = slugify($tool_provider->resource_link->context_label);
+
   $resource_id = $tool_provider->resource_link->getId();
 
   // Create blog
@@ -198,20 +166,21 @@ function lti_do_connect($tool_provider) {
     // Create new blog, if does not exist. Note this gives one blog per context, the consumer supplies a context_id
     // otherwise it creates a blog per resource_id
     $path = $key . '_' . $context_id;
-
   } else {
-    // Create new blog, if does not exist. Note this gives one blog per resource_id
-    //swat Edit to get $content_label $path = $key . $resource_id;
-	$path = $context_label;
-  }
-  // Replace any non-allowed characters in WordPress with -
 
+    //swat Edit to get $content_label $path = $key . $resource_id;
+  	$path = $context_label;
+    // Create new blog, if does not exist. Note this gives one blog per resource_id
+    //$path = $key . $resource_id;
+  }
+
+  // Replace any non-allowed characters in WordPress with -
   $path = preg_replace('/[^_0-9a-zA-Z-]+/', '-', $path);
 
   // Sanity Check: Ensure that path is only _A-Za-z0-9- --- the above should stop this.
   if (preg_match('/[^_0-9a-zA-Z-]+/', $path) == 1) {
     $tool_provider->reason = __('No Blog has been created as the name contains non-alphanumeric: (_a-zA-Z0-9-) allowed', 'lti-text');
-	return FALSE;
+    return FALSE;
   }
 
   // Get any folder(s) that WordPress might be living in
