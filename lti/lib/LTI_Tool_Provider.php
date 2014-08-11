@@ -520,8 +520,8 @@ class LTI_Tool_Provider {
         $title = "Course {$this->resource_link->getId()}";
       }
       $this->resource_link->title = $title;
-	  
-	  
+
+
 	   $context_label = '';
       if (isset($_POST['context_label'])) {
         $context_label = trim($_POST['context_label']);
@@ -532,7 +532,7 @@ class LTI_Tool_Provider {
       }
       $this->resource_link->context_label = $context_label;
 
-	  
+
 // Save LTI parameters
       foreach ($this->lti_settings_names as $name) {
         if (isset($_POST[$name])) {
@@ -560,9 +560,9 @@ class LTI_Tool_Provider {
 	   if (isset($_POST['user_id'])) {
 		  $user_id = trim($_POST['user_id']);
 		  }
-      
+
 	  $this->user = new LTI_User($this->resource_link, $user_id);
-	
+
 
 #
 ### Set the user name
@@ -2622,7 +2622,7 @@ class LTI_User {
  * @return string User ID value
  */
   public function getId($id_scope = NULL) {
-  
+
     if (empty($id_scope)) {
       $id_scope = $this->resource_link->getConsumer()->id_scope;
     }
@@ -2630,7 +2630,7 @@ class LTI_User {
       case LTI_Tool_Provider::ID_SCOPE_GLOBAL:
         $id = $this->resource_link->getKey() . LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->id;
         break;
-      
+
       case LTI_Tool_Provider::ID_SCOPE_CONTEXT:
         $id = $this->resource_link->getKey();
         if ($this->resource_link->lti_context_id) {
@@ -2638,7 +2638,7 @@ class LTI_User {
         }
         $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->id;
         break;
-      
+
       case LTI_Tool_Provider::ID_SCOPE_RESOURCE:
         $id = $this->resource_link->getKey();
         if ($this->resource_link->lti_resource_id) {
@@ -2646,12 +2646,12 @@ class LTI_User {
         }
         $id .= LTI_Tool_Provider::ID_SCOPE_SEPARATOR . $this->id;
         break;
-      //Swat Edit: added case for email based ID  
+      //Swat Edit: added case for email based ID
       case LTI_Tool_Provider::ID_SCOPE_GLOBAL_EMAIL_ID:
         $email = $this->email;
         $id = substr( $email, 0, strpos($email,'@'));
         break;
-   
+
       default:
         $id = $this->id;
         break;
