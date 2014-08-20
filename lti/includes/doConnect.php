@@ -201,8 +201,10 @@ function lti_do_connect($tool_provider) {
     return FALSE;
   }
 
-  // Update/create blog name
-  update_blog_option($blog_id, 'blogname', $tool_provider->resource_link->title);
+  // Create blog name if it doesn't have one defined, otherwise leave it alone. This allows admin to set a friendlier blogname in WP Settings if they'd like.
+  if (!get_blog_option($blog_id, 'blogname')){
+     update_blog_option($blog_id, 'blogname', $tool_provider->consumer->name);
+  }
 
   $role = 'subscriber';
   if ($staff) $role = 'administrator';
