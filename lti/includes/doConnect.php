@@ -85,8 +85,7 @@ function lti_do_connect($tool_provider) {
   // Apply the function pre_user_login before saving to the DB.
   $user_login = apply_filters('pre_user_login', $user_login);
 
-  // Check if this username, $user_login, is already defined
-  $user = get_user_by('login', $user_login);
+
 
   //Swat Edit: array of Banned Users
 	$banned_users= array("www", "web", "root", "admin", "main", "invite", "administrator", "files", "blog");
@@ -97,6 +96,9 @@ function lti_do_connect($tool_provider) {
 		error_log("!!!!!!!!!!!!!!!!!!!Not from swat!!!!!!!!!!!!!!!!!!!!!!!");
     $user_login= $user_login . '-' . $moodleID;
 		}
+
+  // Check if this username, $user_login, is already defined
+  $user = get_user_by('login', $user_login);
 
 	if (!filter_var($tool_provider->user->email, FILTER_VALIDATE_EMAIL) || in_array($user_login, $banned_users))  {
 		wp_logout();
