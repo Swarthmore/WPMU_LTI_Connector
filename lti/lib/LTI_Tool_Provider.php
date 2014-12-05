@@ -75,7 +75,7 @@ class LTI_Tool_Provider {
  */
   const ID_SCOPE_RESOURCE = 3;
  /**
- * Prefix the ID with the consumer key and resource ID.
+ * Base Id on user email address.
  */
   const ID_SCOPE_GLOBAL_EMAIL_ID = 4;
 /**
