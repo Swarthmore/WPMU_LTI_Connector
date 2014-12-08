@@ -171,7 +171,7 @@ function lti_do_connect($tool_provider) {
   } else {
 
     //swat Edit to get $content_label $path = $key . $resource_id;
-  	$path = $context_label;
+  	$path = $context_label . $user_id;
     // Create new blog, if does not exist. Note this gives one blog per resource_id
     //$path = $key . $resource_id;
   }
