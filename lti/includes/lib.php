@@ -173,6 +173,7 @@ function lti_create_db() {
   $sql = 'CREATE TABLE IF NOT EXISTS ' . $prefix . LTI_Data_Connector::CONSUMER_TABLE_NAME . ' (' .
          'consumer_key varchar(255) NOT NULL, ' .
          'name varchar(45) NOT NULL, ' .
+		  'email_domain varchar(45) NOT NULL, ' .
          'secret varchar(32) NOT NULL, ' .
          'lti_version varchar(12) DEFAULT NULL, ' .
          'consumer_name varchar(255) DEFAULT NULL, ' .

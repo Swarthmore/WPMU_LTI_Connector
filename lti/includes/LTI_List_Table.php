@@ -221,6 +221,7 @@ class LTI_List_Table extends WP_List_Table {
      for($i = 0; $i < count($lti_data); $i++) {
        $data[$i]['ID'] = $i;
        $data[$i]['name'] = $lti_data[$i]->name;
+	   $data[$i]['email_domain'] = $lti_data[$i]->email_domain;
        $data[$i]['key'] = $lti_data[$i]->getKey();
        $data[$i]['cname'] = "<span title='" . $lti_data[$i]->consumer_version . "'>" . $lti_data[$i]->consumer_name . "</span>";
        $available = ($lti_data[$i]->getIsAvailable()) ? 'Yes' : 'No';

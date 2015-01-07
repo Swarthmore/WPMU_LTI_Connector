@@ -60,6 +60,7 @@ function createConsumer(url) {
 
 				var postdata =
 			  "lti_name=" + document.addlti.lti_name.value +
+			  "&lti_email_domain=" + document.addlti.lti_email_domain.value +
 				"&lti_key=" + myJSONObject.Key +
 				"&lti_secret=" + myJSONObject.Secret +
 				"&lti_protected=" + document.addlti.lti_protected.checked +
