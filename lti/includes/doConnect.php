@@ -90,10 +90,12 @@ function lti_do_connect($tool_provider) {
   //Swat Edit: array of Banned Users
 	$banned_users= array("www", "web", "root", "admin", "main", "invite", "administrator", "files", "blog");
 	$userEmail = $tool_provider->user->email;
-
+	$defaultEmailDomain = $tool_provider->consumer->email_domain;
+	
 	list($emailUsername, $emailDomain) = explode('@', $tool_provider->user->email);
-	if ($emailDomain !== 'swarthmore.edu'){
-		error_log("!!!!!!!!!!!!!!!!!!!Not from swat!!!!!!!!!!!!!!!!!!!!!!!");
+	if ($emailDomain !== $defaultEmailDomain){
+		error_log("!!!!!!!!!!!!!!!!!!! default domain is " . $defaultEmailDomain);
+		error_log("!!!!!!!!!!!!!!!!!!!Not from default domain!!!!!!!!!!!!!!!!!!!!!!!");
     $user_login= $user_login . '-' . $moodleID;
 		}
 

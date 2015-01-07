@@ -80,6 +80,17 @@ function lti_add_consumer() {
       <input id="lti_name" type="text" aria-required="true" value="<?php echo esc_attr($consumer->name); ?>" name="lti_name" class="regular-text">
     </td>
   </tr>
+	<tr class="form-field form-required">
+    <th scope="row">
+      <label for="lti_email_domain" id="lti_email_domain_text">
+        <?php _e('Primary Email Domain', 'lti-text'); ?>
+        <span class="description"><?php _e('(The primary domain you expect your participant email addresses to originate from. If you expect student@example.edu, put example.edu in the field.)', 'lti-text'); ?></span>
+      </label>
+    </th>
+    <td>
+      <input id="lti_email_domain" type="text" aria-required="true" value="<?php echo esc_attr($consumer->email_domain); ?>" name="lti_email_domain" class="regular-text">
+    </td>
+  </tr>
 
   <?php if ($editmode) { ?>
   <tr class="form-field form-required">
